@@ -1,8 +1,6 @@
 import { notFound } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { Button } from '@/components/ui/button'
-import { Textarea } from '@/components/ui/textarea'
 import { posts } from '@/lib/data'
 
 export default function Post({ params }: { params: { id: string } }) {
@@ -48,8 +46,16 @@ export default function Post({ params }: { params: { id: string } }) {
       <section>
         <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200 mb-4">Comments</h2>
         <form className="space-y-4">
-          <Textarea placeholder="Share your thoughts..." className="w-full" />
-          <Button type="submit">Post Comment</Button>
+          <textarea 
+            placeholder="Share your thoughts..." 
+            className="w-full p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-200"
+          />
+          <button 
+            type="submit"
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Post Comment
+          </button>
         </form>
         <div className="mt-6 space-y-4">
           <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
@@ -61,4 +67,3 @@ export default function Post({ params }: { params: { id: string } }) {
     </article>
   )
 }
-

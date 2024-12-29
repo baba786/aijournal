@@ -1,12 +1,12 @@
-import { getPostsByCategory, getAllPosts } from '@/lib/data'
 import Link from 'next/link'
+import { getPostsByCategory, getAllPosts } from '@/lib/data'
 
 export async function generateStaticParams() {
   const posts = await getAllPosts()
   const categories = Array.from(new Set(posts.map(post => post.category).filter(Boolean)))
   
   return categories.map((category) => ({
-    category: category,
+    category: category?.toLowerCase(),
   }))
 }
 

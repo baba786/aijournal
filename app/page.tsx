@@ -63,7 +63,7 @@ export default async function Home() {
 
         <div className="mt-20">
           <Link
-            href="/posts"
+            href="/post"
             className="group inline-flex items-center gap-2 text-sm hover:text-muted-foreground transition-colors"
           >
             View all posts 

@@ -15,23 +15,32 @@ export type Post = {
   content: string
 }
 
-export async function getPost(slug: string): Promise<Post> {
-  const fullPath = path.join(postsDirectory, `${slug}.md`)
-  const fileContents = fs.readFileSync(fullPath, 'utf8')
-  const { data, content } = matter(fileContents)
-  
-  const processedContent = await remark()
-    .use(html)
-    .process(content)
-  const contentHtml = processedContent.toString()
+export async function getPostBySlug(slug: string): Promise<Post | undefined> {
+  try {
+    const fullPath = path.join(postsDirectory, `${slug}.md`)
+    if (!fs.existsSync(fullPath)) {
+      return undefined
+    }
+    
+    const fileContents = fs.readFileSync(fullPath, 'utf8')
+    const { data, content } = matter(fileContents)
+    
+    const processedContent = await remark()
+      .use(html)
+      .process(content)
+    const contentHtml = processedContent.toString()
 
-  return {
-    slug,
-    title: data.title,
-    date: data.date,
-    category: data.category,
-    excerpt: data.excerpt || content.slice(0, 150) + '...',
-    content: contentHtml,
+    return {
+      slug,
+      title: data.title,
+      date: data.date,
+      category: data.category,
+      excerpt: data.excerpt || content.slice(0, 150) + '...',
+      content: contentHtml,
+    }
+  } catch (error) {
+    console.error(`Error getting post ${slug}:`, error)
+    return undefined
   }
 }
 
@@ -41,12 +50,12 @@ export async function getAllPosts(): Promise<Post[]> {
   }
   
   const fileNames = fs.readdirSync(postsDirectory)
-  const allPostsData = await Promise.all(
+  const allPostsData = (await Promise.all(
     fileNames.map(async (fileName) => {
       const slug = fileName.replace(/\.md$/, '')
-      return getPost(slug)
+      return getPostBySlug(slug)
     })
-  )
+  )).filter((post): post is Post => post !== undefined)
 
   return allPostsData.sort((a, b) => (a.date < b.date ? 1 : -1))
 }

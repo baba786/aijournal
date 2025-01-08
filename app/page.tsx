@@ -1,40 +1,76 @@
 import { getAllPosts } from '@/lib/data'
 import Link from 'next/link'
+import { ArrowRight } from 'lucide-react'
 
 export default async function Home() {
   const posts = await getAllPosts()
 
   return (
-    <div className="space-y-12">
-      <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">Latest Posts</h1>
-      <div className="space-y-16">
-        {posts.map((post) => (
-          <article key={post.slug} className="flex max-w-xl flex-col items-start">
-            <div className="flex items-center gap-x-4 text-xs">
-              <time dateTime={post.date} className="text-gray-500">
-                {post.date}
-              </time>
-              {post.category && (
-                <Link
-                  href={`/category/${post.category}`}
-                  className="relative z-10 rounded-full bg-gray-50 px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-100"
+    <div className="container mx-auto px-4">
+      <section className="py-20 md:py-28">
+        <div className="max-w-2xl">
+          <h1 className="text-3xl md:text-4xl font-medium tracking-tight mb-6 leading-tight">
+            Hey, I'm Sudhanshu — a developer exploring AI and sharing what I learn along the way.
+          </h1>
+          <p className="text-lg text-muted-foreground leading-relaxed">
+            Here you'll find my notes, experiments, and thoughts on artificial intelligence and machine learning.
+          </p>
+        </div>
+      </section>
+
+      <section className="pb-20">
+        <div className="max-w-2xl space-y-16">
+          {posts.map((post, index) => (
+            <article 
+              key={post.slug} 
+              className={`group space-y-4 animate-fade-in animate-fade-in-delay-${Math.min(index + 1, 3)}`}
+            >
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <time dateTime={post.date} className="tabular-nums">
+                  {new Date(post.date).toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                  })}
+                </time>
+                {post.category && (
+                  <>
+                    <span>•</span>
+                    <Link
+                      href={`/category/${encodeURIComponent(post.category?.toLowerCase() || '')}`}
+                      className="hover:text-foreground transition-colors"
+                    >
+                      {post.category}
+                    </Link>
+                  </>
+                )}
+              </div>
+              <h2 className="text-xl font-medium tracking-tight">
+                <Link 
+                  href={`/post/${encodeURIComponent(post.slug)}`}
+                  className="inline-flex items-center gap-2 hover:text-muted-foreground transition-colors"
                 >
-                  {post.category}
-                </Link>
-              )}
-            </div>
-            <div className="group relative">
-              <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                <Link href={`/post/${post.slug}`}>
-                  <span className="absolute inset-0" />
                   {post.title}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                 </Link>
-              </h3>
-              <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{post.excerpt}</p>
-            </div>
-          </article>
-        ))}
-      </div>
+              </h2>
+              <p className="text-muted-foreground leading-relaxed">
+                {post.excerpt}
+              </p>
+            </article>
+          ))}
+        </div>
+
+        <div className="mt-20">
+          <Link
+            href="/posts"
+            className="group inline-flex items-center gap-2 text-sm hover:text-muted-foreground transition-colors"
+          >
+            View all posts 
+            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
+          </Link>
+        </div>
+      </section>
     </div>
   )
 }

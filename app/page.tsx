@@ -37,7 +37,7 @@ export default async function Home() {
                   <>
                     <span>•</span>
                     <Link
-                      href={`/category/${encodeURIComponent(post.category?.toLowerCase() || '')}`}
+                      href={`/category/${post.category?.toLowerCase()}`}
                       className="hover:text-foreground transition-colors"
                     >
                       {post.category}
@@ -47,7 +47,7 @@ export default async function Home() {
               </div>
               <h2 className="text-xl font-medium tracking-tight">
                 <Link 
-                  href={`/post/${encodeURIComponent(post.slug)}`}
+                  href={`/post/${post.slug}`}
                   className="inline-flex items-center gap-2 hover:text-muted-foreground transition-colors"
                 >
                   {post.title}

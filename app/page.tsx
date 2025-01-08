@@ -60,16 +60,6 @@ export default async function Home() {
             </article>
           ))}
         </div>
-
-        <div className="mt-20">
-          <Link
-            href="/post"
-            className="group inline-flex items-center gap-2 text-sm hover:text-muted-foreground transition-colors"
-          >
-            View all posts 
-            <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
-          </Link>
-        </div>
       </section>
     </div>
   )

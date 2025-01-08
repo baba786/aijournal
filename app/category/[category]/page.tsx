@@ -1,56 +1,89 @@
+import { Metadata } from 'next'
+import { notFound } from 'next/navigation'
 import Link from 'next/link'
-import { getPostsByCategory, getAllPosts } from '@/lib/data'
+import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { getPostsByCategory } from '@/lib/data'
 
-export async function generateStaticParams() {
-  const posts = await getAllPosts()
-  const categories = Array.from(new Set(posts.map(post => post.category).filter(Boolean)))
-  
-  return categories.map((category) => ({
-    category: category?.toLowerCase(),
-  }))
+interface CategoryPageProps {
+  params: {
+    category: string
+  }
 }
 
-export default async function Category({ params }: { params: { category: string } }) {
+export async function generateMetadata(
+  { params }: CategoryPageProps
+): Promise<Metadata> {
   const posts = await getPostsByCategory(params.category)
-  const categoryDisplay = params.category.charAt(0).toUpperCase() + params.category.slice(1)
+  if (!posts.length) {
+    return {
+      title: 'Category Not Found',
+    }
+  }
+
+  return {
+    title: `${params.category.charAt(0).toUpperCase() + params.category.slice(1)} Posts`,
+    description: `All posts in the ${params.category} category`,
+  }
+}
+
+export default async function CategoryPage({ params }: CategoryPageProps) {
+  const posts = await getPostsByCategory(params.category)
+
+  if (!posts.length) {
+    notFound()
+  }
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <Link 
-          href="/category"
-          className="text-sm font-medium text-gray-500 hover:text-gray-700"
-        >
-          ← Back to categories
-        </Link>
-        <h1 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
-          Category: {categoryDisplay}
-        </h1>
-      </div>
-      
-      <div className="space-y-16">
-        {posts.length > 0 ? (
-          posts.map((post) => (
-            <article key={post.slug} className="flex max-w-xl flex-col items-start">
-              <div className="flex items-center gap-x-4 text-xs">
-                <time dateTime={post.date} className="text-gray-500">
-                  {post.date}
-                </time>
-              </div>
-              <div className="group relative">
-                <h3 className="mt-3 text-lg font-semibold leading-6 text-gray-900 group-hover:text-gray-600">
-                  <Link href={`/post/${post.slug}`}>
-                    <span className="absolute inset-0" />
+    <div className="container mx-auto px-4">
+      <div className="max-w-2xl py-20 md:py-28">
+        <div className="mb-8">
+          <Link
+            href="/"
+            className="group inline-flex items-center gap-2 text-sm hover:text-muted-foreground transition-colors"
+          >
+            <ArrowLeft className="h-4 w-4 transition-transform group-hover:-translate-x-0.5" />
+            Back to posts
+          </Link>
+        </div>
+
+        <div className="space-y-8 animate-fade-in">
+          <h1 className="text-3xl md:text-4xl font-medium tracking-tight capitalize">
+            {params.category} Posts
+          </h1>
+
+          <div className="space-y-16">
+            {posts.map((post, index) => (
+              <article 
+                key={post.slug}
+                className={`group space-y-4 animate-fade-in animate-fade-in-delay-${Math.min(index + 1, 3)}`}
+              >
+                <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <time dateTime={post.date} className="tabular-nums">
+                    {new Date(post.date).toLocaleDateString('en-US', {
+                      year: 'numeric',
+                      month: 'long',
+                      day: 'numeric'
+                    })}
+                  </time>
+                </div>
+
+                <h2 className="text-xl font-medium tracking-tight">
+                  <Link 
+                    href={`/post/${post.slug}`}
+                    className="inline-flex items-center gap-2 hover:text-muted-foreground transition-colors"
+                  >
                     {post.title}
+                    <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
                   </Link>
-                </h3>
-                <p className="mt-5 line-clamp-3 text-sm leading-6 text-gray-600">{post.excerpt}</p>
-              </div>
-            </article>
-          ))
-        ) : (
-          <p className="text-gray-600 dark:text-gray-400">No posts found in this category.</p>
-        )}
+                </h2>
+
+                <p className="text-muted-foreground leading-relaxed">
+                  {post.excerpt}
+                </p>
+              </article>
+            ))}
+          </div>
+        </div>
       </div>
     </div>
   )
